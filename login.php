@@ -16,10 +16,10 @@
 //        // default return
 //        return false;
 
-require_once("classes/OneFileLoginApplication.php");
+include_once("classes/OneFileLoginApplication.php");
 
 if($application->getUserLoginStatus()){
-  header('Location: index.php');    // If user is already logged in redirect back to index.php
+    include("views/mainForm.php");   // Else goes main screen
 } else {
-  include("views/main.php");   // Else prompt login form
+    header('Location: index.php');    // If user is already logged in redirect back to index.php
 }

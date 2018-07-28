@@ -1,4 +1,5 @@
-<?php include_once 'header.php'; ?>
+<?php  include_once "header.php"; ?>
+<?php //  include_once "$_SERVER[DOCUMENT_ROOT]/header.php"; ?>
 
 <div id="content" class="container-fluid background">
     <div class="container description">

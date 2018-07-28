@@ -12,6 +12,10 @@
             <input type="text" name="utilizador" id="username" placeholder="Utilizador" class="input form-control" autocomplete="on" required autofocus>
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" placeholder="Password" class="input form-control" autocomplete="off" required>
+            <div class="field-group">
+            <div><input type="checkbox" name="remember" id="remember" <?php if(isset($_COOKIE["member_login"])) { ?> checked <?php } ?> />
+		<label for="remember-me">Lembrar-me</label>
+            </div>
             <a href="forgot.php">Esqueceu a password?</a><br><br>
             
             <!-- If there is an error it will be shown. --> 
@@ -29,7 +33,7 @@
     </div>  <!-- End Login Form-->
  
 <!-- URL to registration form -->
-<div class="cnt"><a href="registration.php">Não tem conta? Crie uma</a></div>
+<div class="cnt"><a href="views/registrationForm.php">Não tem conta? Crie uma</a></div>
 
 <!-- Back to main page -->  
 <div class="cnt gray"><a href="index.php">Voltar à página principal</a></div>  

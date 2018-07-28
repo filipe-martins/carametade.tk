@@ -48,12 +48,12 @@
                     <!-- Navigation buttons -->
                     <div class="collapse navbar-collapse" id="myNavbar">
                         <ul class="nav navbar-nav navbar-right">
-                            <?php if (!empty(@$_SESSION['user_id'])): ?>
-                                <li><a href="profile.php"><span class="glyphicon glyphicon-user"></span> Account</a></li>
-                                <li><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Sign out</a></li>
+                            <?php if (!isset($_SESSION['username'])): ?>
+                                <li><a href="profile.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
+                                <li><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
                             <?php else: ?>
-                                <li><a href="login.php"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                                <li><a href="registration.php"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                                <li><a href="login.php"><span class="glyphicon glyphicon-log-in"></span> Entrar</a></li>
+                                <li><a href="registration.php"><span class="glyphicon glyphicon-user"></span> Registrar</a></li>
                                 <?php endif; ?>
                         </ul>
                     </div> <!-- /Navigation buttons -->
