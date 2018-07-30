@@ -48,13 +48,16 @@
                     <!-- Navigation buttons -->
                     <div class="collapse navbar-collapse" id="myNavbar">
                         <ul class="nav navbar-nav navbar-right">
-                            <?php if (!isset($_SESSION['username'])): ?>
-                                <li><a href="profile.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
-                                <li><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
+                            <?php if (isset($_SESSION['username']) || isset($_COOKIE['username'])): ?>
+                                <li><a href="/caraMetade/profile.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
+                                <!--<li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>-->
+                                <li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
                             <?php else: ?>
-                                <li><a href="login.php"><span class="glyphicon glyphicon-log-in"></span> Entrar</a></li>
-                                <li><a href="registration.php"><span class="glyphicon glyphicon-user"></span> Registrar</a></li>
+                                <li><a href="/caraMetade/login.php"><span class="glyphicon glyphicon-log-in"></span> Entrar</a></li>
+                                <?php if ($_SERVER["PHP_SELF"] !== "/registrationForm" ): ?>
+                                    <li><a href="/caraMetade/registration.php?action=registrar"><span class="glyphicon glyphicon-user"></span> Registrar</a></li>
                                 <?php endif; ?>
+                            <?php endif; ?>
                         </ul>
                     </div> <!-- /Navigation buttons -->
 

@@ -1,14 +1,10 @@
-<?php if(!isset($_SESSION)) { session_start();} 
+<?php  
+session_start();
+include_once 'header.php';
 
-/* Require UserClass.php to call registration function */
-require("classes/UserClass.php");
-
-// Call for class constructor.
-$passwordReset = new UserClass();
-
+/* Require Class.php to call registration function */
+include_once("classes/OneFileLoginApplication.php");
 ?>
-
-<?php include_once 'header.php'; ?>
 
 <div class="container">
 
@@ -18,7 +14,7 @@ $passwordReset = new UserClass();
             <h3 class="cnt">Forgot your password?</h3>
             <hr class="colorgraph">
             
-            <p class="">Enter your email. We'll email instructions on how to reset your password.</p>
+            <p class="">Introduza o seu email. Iremos enviar instrucçoes  to reset your password.</p>
             
             <label for="email">E-mail<span class="red">*</span>:</label>
             <input type="email" name="email" id="email" placeholder="E-mail" class="input form-control" autocomplete="off" required autofocus><br>

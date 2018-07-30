@@ -41,6 +41,14 @@ class OneFileLoginApplication {
      * @var string System messages, likes errors, notices, etc.
      */
     public $feedback = "";
+    
+    /**
+     * Simply returns the current status of the screen to see error
+     * @return bool User's login status
+     */
+    public function getFeedback() {
+        return $this->feedback;
+    }
 
     /**
      * Does necessary checks for PHP version and PHP password compatibility library and runs the application
@@ -120,7 +128,7 @@ class OneFileLoginApplication {
     private function performUserLoginAction() {
         if (isset($_GET["action"]) && $_GET["action"] == "logout") {
             $this->doLogout();
-        } elseif (!empty($_SESSION['user_name']) && ($_SESSION['user_is_logged_in'])) {
+        } elseif (!empty($_SESSION['username']) && ($_SESSION['user_is_logged_in'])) {
             $this->doLoginWithSessionData();
         } elseif (isset($_POST["login"])) {
             $this->doLoginWithPostData();
@@ -224,18 +232,18 @@ class OneFileLoginApplication {
                 
                 //definir cookie
                 if (isset($_POST['remember'])) {
-                    setcookie('username', $result_row->username, time() + 60*60*24*366);
-                    setcookie('password', $result_row->password, time() + 60*60*24*366);
+                    setcookie('username', $result_row->username, time() + 60*60*24*366,"/");
+//                    setcookie('password', $result_row->password, time() + 60*60*24*366);
                 }
                 
                 $this->user_is_logged_in = true;
-                header('Location: views/mainForm.php');    // If user is already logged in redirect back to index.php
+//                header('Location: views/mainForm.php');    // If user is already logged in redirect back to index.php
                 return true;
             } else {
-                $this->feedback = "Password errada.";
+                $this->feedback = "Utilizador ou palavra passe errada.";
             }
         } else {
-            $this->feedback = "Este utilizador não existe.";
+            $this->feedback = "Utilizador ou palavra passe errada.";
         }
         // default return
         return false;
@@ -303,7 +311,7 @@ class OneFileLoginApplication {
         // If you meet the inventor of PDO, punch him. Seriously.
         $result_row = $query->fetchObject();
         if ($result_row) {
-            $this->feedback = "Desculpe, esse nome de utilizador / email já foi utilizado. Por favor escolha outro.";
+            $this->feedback = "Desculpe, esse nome de utilizador ou email já foi utilizado. Por favor escolha outro.";
         } else {
             $user_password = $_POST['password'];
             // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 char hash string.
@@ -325,10 +333,13 @@ class OneFileLoginApplication {
             $registration_success_state = $query->execute();
 
             if ($registration_success_state) {
-                $this->feedback = "Sua conta foi criada com sucesso. Já pode fazer login.";
+                $this->feedback = "Sua conta foi criada com sucesso. Já pode escolher entrar.";
+                $_SESSION['username'] = $user_name;
+                $_SESSION['email'] = $user_email;
+                $_SESSION['user_is_logged_in'] = true;
                 return true;
             } else {
-                $this->feedback = "Desculpe, seu registo falhou. Por favor volte atrás e tente novamente.";
+                $this->feedback = "Desculpe, seu registo falhou. Por favor tente novamente.";
             }
         }
         // default return
@@ -349,12 +360,13 @@ class OneFileLoginApplication {
      * demo the "echo" statements are totally okay.
      */
     private function showPageLoggedIn() {
-        if ($this->feedback) {
-            echo $this->feedback . "<br/><br/>";
-        }
-
-        echo "Olá " . $_SESSION['user_name'] . ", está logado.<br/><br/>";
-        echo '<a href="' . $_SERVER['SCRIPT_NAME'] . '?action=logout">Log out</a>';
+//        if ($this->feedback) {
+//            echo $this->feedback . "<br/><br/>";
+//        }
+        $_SESSION['message']= $this->feedback;
+        
+//        echo "Olá " . $_SESSION['username'] . ", está logado.<br/><br/>";
+//        echo '<a href="' . $_SERVER['SCRIPT_NAME'] . '?action=logout">Log out</a>';
     }
 
     /**
@@ -363,9 +375,10 @@ class OneFileLoginApplication {
      * demo the "echo" statements are totally okay.
      */
     private function showPageLoginForm() {
-        if ($this->feedback) {
-            echo $this->feedback . "<br/><br/>";
-        }
+        $_SESSION['message']= $this->feedback;
+//        if ($this->feedback) {
+//            echo $this->feedback . "<br/><br/>";
+//        }
 
 //        include_once("views/loginForm.php");   // Else prompt login form
         //
@@ -388,9 +401,10 @@ class OneFileLoginApplication {
      * demo the "echo" statements are totally okay.
      */
     private function showPageRegistration() {
-        if ($this->feedback) {
-            echo $this->feedback . "<br/><br/>";
-        }
+        $_SESSION['message'] = $this->feedback;
+//        if ($this->feedback) {
+//            echo $this->feedback . "<br/><br/>";
+//        }
 
 //        echo '<h2>Registration</h2>';
 //

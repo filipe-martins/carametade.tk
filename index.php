@@ -1,6 +1,7 @@
-<!--<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />-->
-
 <?php
+if (session_status() == PHP_SESSION_NONE)
+    session_start();
+
 /* Full membership with login and registration
  * PHP script that includes login registration form with proper password salting, login form with validation and
  * MySQL injection protection.
@@ -14,7 +15,7 @@
 
 /* Require login.php to call login function */
 //require("classes/UserClass.php");
-require_once("classes/OneFileLoginApplication.php");
+include_once("classes/OneFileLoginApplication.php");
 
 /* Call for login function */
 //$login = new UserClass();
@@ -36,9 +37,12 @@ require_once("classes/OneFileLoginApplication.php");
     $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
   }
 if (isset($username) || $application->getUserLoginStatus()) {
-    include_once("views/mainForm.php");    // If user is already logged in redirect back to index.php
+    include_once("views/mainForm.php");
+//    include_once("views/mainForm.php");    // If user is already logged in redirect back to Main Screen
 } else {
-    include_once("views/loginForm.php");   // Else prompt login form
+    include_once("views/loginForm.php");
+//    header('Location: views/loginForm.php');// Else prompt login form
 }
 ?>
 
+<!--<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />-->

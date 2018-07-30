@@ -1,4 +1,7 @@
-<?php include_once 'header.php'; ?>
+<?php 
+ob_start();
+include_once 'header.php'; 
+?>
 
 <div class="container">
 
@@ -33,10 +36,12 @@
     </div>  <!-- End Login Form-->
  
 <!-- URL to registration form -->
-<div class="cnt"><a href="views/registrationForm.php">Não tem conta? Crie uma</a></div>
+<div class="cnt"><a href="/caraMetade/registration.php?action=registrar">Não tem conta? Crie uma</a></div>
 
 <!-- Back to main page -->  
 <div class="cnt gray"><a href="index.php">Voltar à página principal</a></div>  
   
 </div>
 <!-- End div -->
+<?php ob_end_flush();
+?>
