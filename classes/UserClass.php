@@ -270,7 +270,7 @@ class UserClass{
                     } else {
                         // Insert data into database
                         $code = substr(md5(mt_rand()),0,15);
-                        $stmt = $conn->prepare("INSERT INTO users (username, email, password, activation_code) VALUES (?,?,?,?)");
+                        $stmt = $conn->prepare("INSERT INTO users (username, email, password, reset_code) VALUES (?,?,?,?)");
                         $stmt->bind_param("ssss", $username, $email, $securing, $code);
                         $stmt->execute();
                         $stmt->close();
@@ -321,22 +321,22 @@ class UserClass{
             
             // Variables for Verify() 
             $user_email=htmlspecialchars($_GET['id']);
-            $activation_code=htmlspecialchars($_GET['code']);
+            $reset_code=htmlspecialchars($_GET['code']);
             
             // Require credentials for DB connection.
             require ('config/dbconnect.php');
             
-            // Cross-reference e-mail and activation_code in database with values from URL.
-            $stmt = $conn->prepare("SELECT email FROM users WHERE email = ? and activation_code = ?");
-            $stmt->bind_param("ss", $user_email, $activation_code);
+            // Cross-reference e-mail and reset_code in database with values from URL.
+            $stmt = $conn->prepare("SELECT email FROM users WHERE email = ? and reset_code = ?");
+            $stmt->bind_param("ss", $user_email, $reset_code);
             $stmt->execute();
             $result = $stmt->get_result();
             $stmt->close(); 
-            // If e-mail and activation_code exist and are correct then update user is_activated value.
+            // If e-mail and reset_code exist and are correct then update user is_activated value.
             if($result->num_rows == 1){
-                $stmt = $conn->prepare("UPDATE users SET is_activated = ? WHERE email = ? and activation_code = ?");
+                $stmt = $conn->prepare("UPDATE users SET is_activated = ? WHERE email = ? and reset_code = ?");
                 $verified = 1;
-                $stmt->bind_param("iss", $verified, $user_email, $activation_code);
+                $stmt->bind_param("iss", $verified, $user_email, $reset_code);
                 $stmt->execute();
                 $stmt->close();
                 return TRUE;

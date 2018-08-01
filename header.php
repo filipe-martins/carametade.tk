@@ -49,7 +49,11 @@
                     <div class="collapse navbar-collapse" id="myNavbar">
                         <ul class="nav navbar-nav navbar-right">
                             <?php if (isset($_SESSION['username']) || isset($_COOKIE['username'])): ?>
-                                <li><a href="/caraMetade/profile.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
+                                <li><a href="/caraMetade/procurar.php"><span class="glyphicon glyphicon-search"></span> Procurar</a></li>
+                                <li><a href="/caraMetade/favoritos.php"><span class="glyphicon glyphicon-star-empty"></span> Favoritos</a></li>
+                                <li><a href="/caraMetade/mensagens.php"><span class="glyphicon glyphicon-inbox"></span> Mensagens</a></li>
+                                <!--<li><a href="/caraMetade/procurar.php"><img src="/caraMetade/img/proc_coracao.png" width="20" height="20">Procurar</a></li>-->
+                                <li><a href="/caraMetade/perfil.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
                                 <!--<li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>-->
                                 <li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
                             <?php else: ?>

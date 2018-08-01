@@ -15,12 +15,12 @@ class OneFileLoginApplication {
     /**
      * @var string Type of used database (currently only SQLite, but feel free to expand this with mysql etc)
      */
-    //private $db_type = "sqlite"; //
+//private $db_type = "sqlite"; //
 
     /**
      * @var string Path of the database file (create this with _install.php)
      */
-    //private $db_sqlite_path = "./users.db";
+//private $db_sqlite_path = "./users.db";
 
     private $servername = "localhost";
     private $username = "root";
@@ -41,7 +41,7 @@ class OneFileLoginApplication {
      * @var string System messages, likes errors, notices, etc.
      */
     public $feedback = "";
-    
+
     /**
      * Simply returns the current status of the screen to see error
      * @return bool User's login status
@@ -75,7 +75,7 @@ class OneFileLoginApplication {
         } elseif (version_compare(PHP_VERSION, '5.5.0', '>=')) {
             return true;
         }
-        // default return
+// default return
         return false;
     }
 
@@ -83,16 +83,16 @@ class OneFileLoginApplication {
      * This is basically the controller that handles the entire flow of the application.
      */
     public function runApplication() {
-        // check is user wants to see register page (etc.)
+// check is user wants to see register page (etc.)
         if (isset($_POST["registration"]) && $_POST["registration"] == "Registrar") {
             $this->doRegistration();
             $this->showPageRegistration();
         } else {
-            // start the session, always needed!
+// start the session, always needed!
             $this->doStartSession();
-            // check for possible user interactions (login with session/post data or logout)
+// check for possible user interactions (login with session/post data or logout)
             $this->performUserLoginAction();
-            // show "page", according to user's login status
+// show "page", according to user's login status
             if ($this->getUserLoginStatus()) {
                 $this->showPageLoggedIn();
             } else {
@@ -110,7 +110,7 @@ class OneFileLoginApplication {
             if (!isset($this->db_connection))
                 $this->db_connection = new PDO("mysql:host=$this->servername;dbname=$this->dbname", $this->username, $this->password);
 
-            // set the PDO error mode to exception
+// set the PDO error mode to exception
             $this->db_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return true;
         } catch (PDOException $e) {
@@ -182,7 +182,7 @@ class OneFileLoginApplication {
                 $this->createNewUser();
             }
         }
-        // default return
+// default return
         return false;
     }
 
@@ -198,7 +198,7 @@ class OneFileLoginApplication {
         } elseif (empty($_POST['user_password'])) {
             $this->feedback = "Campo da password está vazia.";
         }
-        // default return
+// default return
         return false;
     }
 
@@ -207,35 +207,35 @@ class OneFileLoginApplication {
      * @return bool User login success status
      */
     private function checkPasswordCorrectnessAndLogin() {
-        // remember: the user can log in with username or email address
-        // prepare sql and bind parameters
+// remember: the user can log in with username or email address
+// prepare sql and bind parameters
         $sql = "SELECT username, email, password FROM users
                 WHERE username = :username OR email = :username LIMIT 1";
         $query = $this->db_connection->prepare($sql);
         $query->bindParam(':username', $_POST['utilizador']);
         $query->execute();
 
-        // Btw that's the weird way to get num_rows in PDO with SQLite:
-        // if (count($query->fetchAll(PDO::FETCH_NUM)) == 1) {
-        // Holy! But that's how it is. $result->numRows() works with SQLite pure, but not with SQLite PDO.
-        // This is so crappy, but that's how PDO works.
-        // As there is no numRows() in SQLite/PDO (!!) we have to do it this way:
-        // If you meet the inventor of PDO, punch him. Seriously.
+// Btw that's the weird way to get num_rows in PDO with SQLite:
+// if (count($query->fetchAll(PDO::FETCH_NUM)) == 1) {
+// Holy! But that's how it is. $result->numRows() works with SQLite pure, but not with SQLite PDO.
+// This is so crappy, but that's how PDO works.
+// As there is no numRows() in SQLite/PDO (!!) we have to do it this way:
+// If you meet the inventor of PDO, punch him. Seriously.
         $result_row = $query->fetchObject();
         if ($result_row) {
-            // using PHP 5.5's password_verify() function to check password
+// using PHP 5.5's password_verify() function to check password
             if (password_verify($_POST['password'], $result_row->password)) {
-                // write user data into PHP SESSION [a file on your server]
+// write user data into PHP SESSION [a file on your server]
                 $_SESSION['username'] = $result_row->username;
                 $_SESSION['email'] = $result_row->email;
                 $_SESSION['user_is_logged_in'] = true;
-                
-                //definir cookie
+
+//definir cookie
                 if (isset($_POST['remember'])) {
-                    setcookie('username', $result_row->username, time() + 60*60*24*366,"/");
+                    setcookie('username', $result_row->username, time() + 60 * 60 * 24 * 366, "/");
 //                    setcookie('password', $result_row->password, time() + 60*60*24*366);
                 }
-                
+
                 $this->user_is_logged_in = true;
 //                header('Location: views/mainForm.php');    // If user is already logged in redirect back to index.php
                 return true;
@@ -245,7 +245,7 @@ class OneFileLoginApplication {
         } else {
             $this->feedback = "Utilizador ou palavra passe errada.";
         }
-        // default return
+// default return
         return false;
     }
 
@@ -254,17 +254,15 @@ class OneFileLoginApplication {
      * @return bool Success status of user's registration data validation
      */
     private function checkRegistrationData() {
-        // if no registration form submitted: exit the method
+// if no registration form submitted: exit the method
         if (!isset($_POST["registration"])) {
             return false;
         }
 
-        // validating the input
-        if (!empty($_POST['utilizador']) && strlen($_POST['utilizador']) <= 64 && strlen($_POST['utilizador']) >= 2 && preg_match('/^[a-z\d]{2,64}$/i', $_POST['utilizador']) 
-                && !empty($_POST['email']) && strlen($_POST['email']) <= 64 && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && !empty($_POST['password']) 
-                && strlen($_POST['password']) >= 6 && !empty($_POST['password2']) && ($_POST['password'] === $_POST['password2'])) {
-            
-            // only this case return true, only this case is valid
+// validating the input
+        if (!empty($_POST['utilizador']) && strlen($_POST['utilizador']) <= 64 && strlen($_POST['utilizador']) >= 2 && preg_match('/^[a-z\d]{2,64}$/i', $_POST['utilizador']) && !empty($_POST['email']) && strlen($_POST['email']) <= 64 && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && !empty($_POST['password']) && strlen($_POST['password']) >= 6 && !empty($_POST['password2']) && ($_POST['password'] === $_POST['password2'])) {
+
+// only this case return true, only this case is valid
             return true;
         } elseif (empty($_POST['utilizador'])) {
             $this->feedback = "Sem utilizador";
@@ -288,7 +286,7 @@ class OneFileLoginApplication {
             $this->feedback = "Ocorreu um erro desconhecido!";
         }
 
-        // default return
+// default return
         return false;
     }
 
@@ -297,7 +295,7 @@ class OneFileLoginApplication {
      * @return bool Success status of user registration
      */
     private function createNewUser() {
-        // remove html code etc. from username and email
+// remove html code etc. from username and email
         $user_name = htmlentities($_POST['utilizador'], ENT_QUOTES);
         $user_email = htmlentities($_POST['email'], ENT_QUOTES);
 
@@ -307,29 +305,29 @@ class OneFileLoginApplication {
         $query->bindValue(':user_email', $user_email);
         $query->execute();
 
-        // As there is no numRows() in SQLite/PDO (!!) we have to do it this way:
-        // If you meet the inventor of PDO, punch him. Seriously.
+// As there is no numRows() in SQLite/PDO (!!) we have to do it this way:
+// If you meet the inventor of PDO, punch him. Seriously.
         $result_row = $query->fetchObject();
         if ($result_row) {
             $this->feedback = "Desculpe, esse nome de utilizador ou email já foi utilizado. Por favor escolha outro.";
         } else {
             $user_password = $_POST['password'];
-            // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 char hash string.
-            // the constant PASSWORD_DEFAULT comes from PHP 5.5 or the password_compatibility_library
+// crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 char hash string.
+// the constant PASSWORD_DEFAULT comes from PHP 5.5 or the password_compatibility_library
             $user_password_hash = password_hash($user_password, PASSWORD_DEFAULT);
-            //activation code
+//activation code
             $code = substr(md5(mt_rand()), 0, 15);
-            $sql = 'INSERT INTO users (username, email, password, is_activated, activation_code)
-                    VALUES(:user_name, :email, :user_password_hash, :is_activated, :activation_code)';
+            $sql = 'INSERT INTO users (username, email, password, is_activated, reset_code)
+                    VALUES(:user_name, :email, :user_password_hash, :is_activated, :reset_code)';
             $query = $this->db_connection->prepare($sql);
             $query->bindValue(':user_name', $user_name);
             $query->bindValue(':email', $user_email);
             $query->bindValue(':user_password_hash', $user_password_hash);
             $query->bindValue(':is_activated', false);
-            $query->bindValue(':activation_code', $code);
+            $query->bindValue(':reset_code', $code);
 
-            // PDO's execute() gives back TRUE when successful, FALSE when not
-            // @link http://stackoverflow.com/q/1661863/1114320
+// PDO's execute() gives back TRUE when successful, FALSE when not
+// @link http://stackoverflow.com/q/1661863/1114320
             $registration_success_state = $query->execute();
 
             if ($registration_success_state) {
@@ -342,7 +340,7 @@ class OneFileLoginApplication {
                 $this->feedback = "Desculpe, seu registo falhou. Por favor tente novamente.";
             }
         }
-        // default return
+// default return
         return false;
     }
 
@@ -363,8 +361,8 @@ class OneFileLoginApplication {
 //        if ($this->feedback) {
 //            echo $this->feedback . "<br/><br/>";
 //        }
-        $_SESSION['message']= $this->feedback;
-        
+        $_SESSION['message'] = $this->feedback;
+
 //        echo "Olá " . $_SESSION['username'] . ", está logado.<br/><br/>";
 //        echo '<a href="' . $_SERVER['SCRIPT_NAME'] . '?action=logout">Log out</a>';
     }
@@ -375,13 +373,12 @@ class OneFileLoginApplication {
      * demo the "echo" statements are totally okay.
      */
     private function showPageLoginForm() {
-        $_SESSION['message']= $this->feedback;
+        $_SESSION['message'] = $this->feedback;
 //        if ($this->feedback) {
 //            echo $this->feedback . "<br/><br/>";
 //        }
-
 //        include_once("views/loginForm.php");   // Else prompt login form
-        //
+//
 //        echo '<h2>Login</h2>';
 //
 //        echo '<form method="post" action="' . $_SERVER['SCRIPT_NAME'] . '" name="loginform">';
@@ -405,7 +402,6 @@ class OneFileLoginApplication {
 //        if ($this->feedback) {
 //            echo $this->feedback . "<br/><br/>";
 //        }
-
 //        echo '<h2>Registration</h2>';
 //
 //        echo '<form method="post" action="' . $_SERVER['SCRIPT_NAME'] . '?action=register" name="registerform">';
@@ -423,7 +419,25 @@ class OneFileLoginApplication {
 //        echo '<a href="' . $_SERVER['SCRIPT_NAME'] . '">Homepage</a>';
     }
 
-}
+    public function createLinkResetPassword() {
+        / prepare sql and bind parameters
+        $sql = "SELECT username, email, password FROM users
+                WHERE username = :username OR email = :username LIMIT 1";
+        $query = $this->db_connection->prepare($sql);
+        $query->bindParam(':username', $_POST['utilizador']);
+        $query->execute();
+        
+        $select = mysql_query("select email,password from user where email='$email'");
+        if (mysql_num_rows($select) == 1) {
+            while ($row = mysql_fetch_array($select)) {
+                $email = md5($row['email']);
+                $pass = md5($row['password']);
+            }
+        }
+    }
+
+    
+}//end class
 
 if (!isset($application))
     $application = new OneFileLoginApplication();

@@ -33,7 +33,7 @@ CREATE TABLE `users` (
   `email` varchar(40) NOT NULL,
   `password` varchar(128) NOT NULL,
   `is_activated` tinyint(1) NOT NULL,
-  `activation_code` varchar(16) DEFAULT NULL,
+  `reset_code` varchar(16) DEFAULT NULL,
   `fpassword_key` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
