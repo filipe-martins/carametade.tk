@@ -420,22 +420,85 @@ class OneFileLoginApplication {
     }
 
     public function createLinkResetPassword() {
-        / prepare sql and bind parameters
-        $sql = "SELECT username, email, password FROM users
-                WHERE username = :username OR email = :username LIMIT 1";
-        $query = $this->db_connection->prepare($sql);
-        $query->bindParam(':username', $_POST['utilizador']);
-        $query->execute();
-        
-        $select = mysql_query("select email,password from user where email='$email'");
-        if (mysql_num_rows($select) == 1) {
-            while ($row = mysql_fetch_array($select)) {
-                $email = md5($row['email']);
-                $pass = md5($row['password']);
+
+        // Require credentials for DB connection.
+//            require ('config/dbconnect.php');
+        // prepare sql and bind parameters
+        if ($this->createDatabaseConnection()) {
+            $sql = "SELECT email FROM users WHERE email = ?";
+            $query = $this->db_connection->prepare($sql);
+            $query->bindParam(1, $_POST['email']);
+            $query->execute();
+            $result_row = $query->fetchObject();
+            if ($result_row) {
+                // If e-mail and reset_code exist and are correct then update user is_activated value.
+                $sql = "UPDATE users SET reset_code = ? WHERE email = ?";
+                $forgot_password_key = password_hash($_POST['email'], PASSWORD_DEFAULT);
+                $query = $this->db_connection->prepare($sql);
+                $query->bindParam("1", $forgot_password_key);
+                $query->bindParam("2", $_POST['email']);
+                $query->execute();
+
+//                $_SESSION['SuccessMessage'] = 'User has been created!';
+
+                $message = "Foi enviado para o seu email instrucções para definir uma nova password.";
+//                $message = "htp://localhost/caraMetade/email=" . $_POST['email'] . "?codigo=". $forgot_password_key . "";
+//                http://localhost/caraMetade/reset_password.php?email=filipe.martins.400@gmail.com&codigo=$2y$10$w7p6vzgWd018crKVZPp4SuqbZUBzU/dn//BX0gyKWge7vO3He/n5K
+//                $to = $email;
+//                $subject = "Reset password";
+//                $from = 'test@membership.com'; // Insert the e-mail from where you want to send the emails.
+//                $body = '<a href="YOURWEBSITEURL/password_reset.php?email=' . $email . '&key=' . $forgot_password_key . '">password_reset.php?email=' . $email . '&key=' . $forgot_password_key . '</a>'; // Replace YOURWEBSITEURL with your own URL for the link to work.
+//                $headers = "From: " . $from . "\r\n";
+//                $headers .= "Reply-To: " . $from . "\r\n";
+//                $headers .= "MIME-Version: 1.0\r\n";
+//                $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+//                mail($to, $subject, $body, $headers);
+                $_SESSION['message'] = $message;
+                return true;
             }
+        }
+        return false;
+
+
+//        $select = mysql_query("select email,password from user where email='$email'");
+//        if (mysql_num_rows($select) == 1) {
+//            while ($row = mysql_fetch_array($select)) {
+//                $email = md5($row['email']);
+//                $pass = md5($row['password']);
+//            }
+//        }
+    }
+
+    private function verifyReset_code($param) {
+        if (isset($_GET["email"]) && isset($_GET["codigo"])){
+            // Variables for reset code
+            $user_email = htmlspecialchars($_GET['email']);
+            $reset_code = htmlspecialchars($_GET['codigo']);
+            
+                // prepare sql and bind parameters
+            $sql = "SELECT password, reset_code FROM users
+                    WHERE email = :email AND reset_code = :reset_code LIMIT 1";
+            $query = $this->db_connection->prepare($sql);
+            $query->bindParam(':email', $_POST['email']);
+            $query->bindParam(':reset_cod3e', $_POST['codigo']);
+            $query->execute();
+
+            $result_row = $query->fetchObject();
+            if ($result_row) {
+                return true;
+            }
+
         }
     }
 
+    function createNewPassword() {
+
+            $email = $_POST['email'];
+            $pass = $_POST['password'];
+            mysql_connect('localhost', 'root', '');
+            mysql_select_db('sample');
+            $select = mysql_query("update user set password='$pass' where email='$email'");
+    }
     
 }//end class
 
