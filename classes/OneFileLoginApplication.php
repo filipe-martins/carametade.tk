@@ -269,7 +269,7 @@ class OneFileLoginApplication {
         } elseif (empty($_POST['password']) || empty($_POST['password2'])) {
             $this->feedback = "Sem password";
         } elseif ($_POST['password'] !== $_POST['password2']) {
-            $this->feedback = "Password e a nova password sÃ£o a mesma";
+            $this->feedback = "Não introduziu a mesma password nos dois campos!";
         } elseif (strlen($_POST['password']) < 6) {
             $this->feedback = "A password tem de ter no mÃ­nimo 6 caracteres";
         } elseif (strlen($_POST['utilizador']) > 64 || strlen($_POST['utilizador']) < 2) {
@@ -419,7 +419,14 @@ class OneFileLoginApplication {
 //        echo '<a href="' . $_SERVER['SCRIPT_NAME'] . '">Homepage</a>';
     }
 
-    public function createLinkResetPassword() {
+    public function createLinkResetPassword() { // Harvest submitted e-mail address
+        if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $email = $_POST['email'];
+        } else {
+            $_SESSION['message'] = "O email não é válido!";
+            return false;
+            ;
+        }
 
         // Require credentials for DB connection.
 //            require ('config/dbconnect.php');
@@ -427,23 +434,24 @@ class OneFileLoginApplication {
         if ($this->createDatabaseConnection()) {
             $sql = "SELECT email FROM users WHERE email = ?";
             $query = $this->db_connection->prepare($sql);
-            $query->bindParam(1, $_POST['email']);
+            $query->bindParam(1, $email);
             $query->execute();
             $result_row = $query->fetchObject();
             if ($result_row) {
                 // If e-mail and reset_code exist and are correct then update user is_activated value.
                 $sql = "UPDATE users SET reset_code = ? WHERE email = ?";
-                $forgot_password_key = password_hash($_POST['email'], PASSWORD_DEFAULT);
+                $forgot_password_key = password_hash($email, PASSWORD_DEFAULT);
                 $query = $this->db_connection->prepare($sql);
                 $query->bindParam("1", $forgot_password_key);
-                $query->bindParam("2", $_POST['email']);
+                $query->bindParam("2", $email);
                 $query->execute();
 
 //                $_SESSION['SuccessMessage'] = 'User has been created!';
 
                 $message = "Foi enviado para o seu email instrucções para definir uma nova password.";
-//                $message = "htp://localhost/caraMetade/email=" . $_POST['email'] . "?codigo=". $forgot_password_key . "";
-//                http://localhost/caraMetade/reset_password.php?email=filipe.martins.400@gmail.com&codigo=$2y$10$w7p6vzgWd018crKVZPp4SuqbZUBzU/dn//BX0gyKWge7vO3He/n5K
+//                msg= Prezado usuário, \ n \ nSe este e-mail não se aplicar a você, ignore-o. Parece que você solicitou uma redefinição de senha em nosso site www.yoursitehere.com \ n \ nPara redefinir sua senha, clique no link abaixo. Se você não conseguir clicar nele, cole-o na barra de endereço do navegador da Web. \ N \ n ". $ Pwrurl." \ N \ nObrigado, \ nA Administração
+//                $message = "htp://localhost/caraMetade/email=" . $email . "?codigo=". $forgot_password_key . "";
+//                http://localhost/caraMetade/reset_password.php?email=filipe.martins.400@gmail.com&codigo=$2y$10$jaBnUtGuF8ZvAVGDw2t4TePkzJpwr1Ms/CZeDXA8pwj0mndW0e.MK
 //                $to = $email;
 //                $subject = "Reset password";
 //                $from = 'test@membership.com'; // Insert the e-mail from where you want to send the emails.
@@ -455,6 +463,8 @@ class OneFileLoginApplication {
 //                mail($to, $subject, $body, $headers);
                 $_SESSION['message'] = $message;
                 return true;
+            } else {
+                $_SESSION['message'] = "O email não existe!";
             }
         }
         return false;
@@ -469,38 +479,78 @@ class OneFileLoginApplication {
 //        }
     }
 
-    private function verifyReset_code($param) {
-        if (isset($_GET["email"]) && isset($_GET["codigo"])){
+    public function verifyReset_code() {
+        if ($this->createDatabaseConnection() && isset($_GET["email"]) && isset($_GET["codigo"])) {
             // Variables for reset code
             $user_email = htmlspecialchars($_GET['email']);
             $reset_code = htmlspecialchars($_GET['codigo']);
-            
-                // prepare sql and bind parameters
-            $sql = "SELECT password, reset_code FROM users
+
+            // prepare sql and bind parameters
+            $sql = "SELECT email, reset_code FROM users
                     WHERE email = :email AND reset_code = :reset_code LIMIT 1";
             $query = $this->db_connection->prepare($sql);
-            $query->bindParam(':email', $_POST['email']);
-            $query->bindParam(':reset_cod3e', $_POST['codigo']);
+            $query->bindParam(':email', $user_email);
+            $query->bindParam(':reset_code', $reset_code);
             $query->execute();
 
             $result_row = $query->fetchObject();
             if ($result_row) {
                 return true;
             }
-
         }
     }
 
-    function createNewPassword() {
+    public function createNewPassword() {
+        try {
+            if ($this->createDatabaseConnection()) {
+                $email = $_POST['email'];
+                $pass = $_POST['password3'];
 
-            $email = $_POST['email'];
-            $pass = $_POST['password'];
-            mysql_connect('localhost', 'root', '');
-            mysql_select_db('sample');
-            $select = mysql_query("update user set password='$pass' where email='$email'");
+                $user_password_hash = password_hash($pass, PASSWORD_DEFAULT);
+
+                $sql = "UPDATE users SET password = ?, reset_code = ? WHERE email = ?";
+                $query = $this->db_connection->prepare($sql);
+                $query->bindParam(1, $user_password_hash);
+                $query->bindValue(2, "");
+                $query->bindParam(3, $email);
+                $query->execute();
+                $_SESSION['message'] = "Password alterada com êxito!";
+                return true;
+            }
+        } catch (Exception $exc) {
+            $_SESSION['message'] = "Erro definindo a nova password!";
+        }
     }
     
-}//end class
+    public function getPerfisCriterioProcura($procuro, $distrito, $idadeInf, $idadeSup) {
+        // prepare sql and bind parameters
+        $sql = "SELECT nome, data_nasc, Estado_Civil, Descricao FROM perfil
+                WHERE procura = :procuro AND  distrito = :distrito AND ( (data_nasc >= :idade_inferior) && (data_nasc >= :idade_superior)) ";
+        $query = $this->db_connection->prepare($sql);
+        $query->bindParam(':procuro', $procuro);
+        $query->bindParam(':distrito', $distrito);
+        $query->execute();
+    }
+    
+    private function getUserIdByName($username) {
+        $sql = "SELECT id FROM users WHERE id = config.userid";
+        $query = $this->db_connection->prepare($sql);
+        $query->execute();
+        return 1; 
+    }
+    
+    public function getUserProcuroParams() {
+        $userid = $this->getUserIdByName($_SESSION['username']);
+        $sql = "SELECT procuro, distrito, data_nasc FROM config WHERE userid = :userid";
+        $query = $this->db_connection->prepare($sql);
+        $query->bindParam(':procuro', $_SESSION['procuro']);
+        $query->execute();
+        $_SESSION['procuro'] = ""; 
+    }
+
+}
+
+//end class
 
 if (!isset($application))
     $application = new OneFileLoginApplication();

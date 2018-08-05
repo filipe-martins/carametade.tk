@@ -2,7 +2,7 @@
 include_once $_SERVER["DOCUMENT_ROOT"] . "/caraMetade/header.php";
 //Post Params incluir
 ?>
-<?php //  include_once "$_SERVER[DOCUMENT_ROOT]/header.php";    ?>
+<?php //  include_once "$_SERVER[DOCUMENT_ROOT]/header.php";     ?>
 <head>
     <style>
         form label {
@@ -33,20 +33,26 @@ include_once $_SERVER["DOCUMENT_ROOT"] . "/caraMetade/header.php";
 
 <div id="content" class="container-fluid background"> 
     <div class="container description">
-        <a name="about"></a><h2><center>Logged In</center></h2>         
+        <a name="about"></a><h2><center>Bem vindo!</center></h2>         
         <div class="descText center-block">
             <hr class="colorgraph">
-            <p><center>To make page member only please add your content between:
-                if($login->isLoggedIn() == true){<br>
-                Your content here.<br>
-                } tags.
-                <br><br>
+            <ul class="nav navbar-nav navbar-center">
+                <li><a href="/caraMetade/procurar.php"><span class="glyphicon glyphicon-search"></span> Procurar</a></li>
+                <li><a href="/caraMetade/favoritos.php"><span class="glyphicon glyphicon-star-empty"></span> Favoritos</a></li>
+                <li><a href="/caraMetade/mensagens.php"><span class="glyphicon glyphicon-inbox"></span> Mensagens</a></li>
+                <!--<li><a href="/caraMetade/procurar.php"><img src="/caraMetade/img/proc_coracao.png" width="20" height="20">Procurar</a></li>-->
+                <li><a href="/caraMetade/perfil.php"><span class="glyphicon glyphicon-user"></span> Perfil</a></li>
+                <!--<li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>-->
+                <li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
+            </ul>
+            <br>
+            <br><br>
 
-                <!-- Profile link -->
-                <a href="/caraMetade/perfil.php">Account settings</a><br>
+            <!-- Profile link -->
+            <!--<a href="/caraMetade/perfil.php">Account settings</a><br>-->
 
-                <!-- Back to main page -->  
-                <a href="../logout.php">Back to main page</a>
+            <!-- Back to main page -->  
+            <!--<a href="<?= $_SERVER["DOCUMENT_ROOT"] ?>/caraMetade/logout.php">Back to main page</a>-->
 
             </center></p>
         </div>

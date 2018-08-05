@@ -40,9 +40,7 @@
 
                     <!-- Logo -->
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="index.php" >
-                            Cara Metade 
-                        </a>    
+                        <a href="index.php"><img src="/caraMetade/img/caraMetade_cortada.png" style="width:80px;"</a>    
                     </div>  <!-- /Logo -->
 
                     <!-- Navigation buttons -->
@@ -58,10 +56,10 @@
                                 <li><a href="/caraMetade/logout.php"><span class="glyphicon glyphicon-log-out"></span> Sair</a></li>
                             <?php else: ?>
                                 <li><a href="/caraMetade/login.php"><span class="glyphicon glyphicon-log-in"></span> Entrar</a></li>
-                                <?php if ($_SERVER["PHP_SELF"] !== "/registrationForm" ): ?>
+                                <?php if ($_SERVER["PHP_SELF"] !== "/registrationForm"): ?>
                                     <li><a href="/caraMetade/registration.php?action=registrar"><span class="glyphicon glyphicon-user"></span> Registrar</a></li>
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                            <?php endif; ?>
                         </ul>
                     </div> <!-- /Navigation buttons -->
 
