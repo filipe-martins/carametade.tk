@@ -2,7 +2,7 @@
 include_once $_SERVER["DOCUMENT_ROOT"] . "/caraMetade/header.php";
 //Post Params incluir
 ?>
-<?php //  include_once "$_SERVER[DOCUMENT_ROOT]/header.php";     ?>
+<?php //  include_once "$_SERVER[DOCUMENT_ROOT]/header.php";      ?>
 <head>
     <style>
         form label {

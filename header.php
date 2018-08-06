@@ -11,14 +11,14 @@
         <meta name="keywords" content="cara metade, PHP, queca, encontros, uma noite, encontros amorosos, amor ">
         <meta name="author" content="Filipe Martins">
 
-        <!-- Include Bootstrap .css -->
+         <!--Include Bootstrap .css--> 
         <link rel="stylesheet" href="css/bootstrap/css/bootstrap.css">
-        <!-- Bootstrap -->
+         <!--Bootstrap--> 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="css/bootstrap/js/bootstrap.min.js"></script>
-        <!-- Custom .css -->
+         <!--Custom .css--> 
         <link rel="stylesheet" href="css/custom/custom.css">
-        <!-- Custom font -->
+         <!--Custom font--> 
         <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
     </head>
 

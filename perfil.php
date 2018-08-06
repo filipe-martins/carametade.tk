@@ -16,7 +16,13 @@ if ($_COOKIE) {
     $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
     $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
 }
+
+if (isset($_POST) && !empty($_POST['Nome']))
+{
+    $application->actualizaPerfil();
+}
 if (isset($username) || $application->getUserLoginStatus()) {
+    $application->setVarsPerfil();
     include_once("views/perfilForm.php");
 //    include_once("views/mainForm.php");    // If user is already logged in show prefil
 } else {

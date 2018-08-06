@@ -84,20 +84,19 @@ class OneFileLoginApplication {
      */
     public function runApplication() {
 // check is user wants to see register page (etc.)
-        if (isset($_POST["registration"]) && $_POST["registration"] == "Registrar") {
-            $this->doRegistration();
-            $this->showPageRegistration();
-        } else {
+//        if (isset($_POST["registration"]) && $_POST["registration"] == "Registrar") {
+//            $this->doRegistration();
+//            $this->showPageRegistration();
+//        } else {
 // start the session, always needed!
-            $this->doStartSession();
+        $this->doStartSession();
 // check for possible user interactions (login with session/post data or logout)
-            $this->performUserLoginAction();
+        $this->performUserLoginAction();
 // show "page", according to user's login status
-            if ($this->getUserLoginStatus()) {
-                $this->showPageLoggedIn();
-            } else {
-                $this->showPageLoginForm();
-            }
+        if ($this->getUserLoginStatus()) {
+            $this->showPageLoggedIn();
+        } else {
+            $this->showPageLoginForm();
         }
     }
 
@@ -427,28 +426,29 @@ class OneFileLoginApplication {
             return false;
             ;
         }
+        if (!$this->createDatabaseConnection())
+            return false;
 
         // Require credentials for DB connection.
 //            require ('config/dbconnect.php');
         // prepare sql and bind parameters
-        if ($this->createDatabaseConnection()) {
-            $sql = "SELECT email FROM users WHERE email = ?";
+        $sql = "SELECT email FROM users WHERE email = ?";
+        $query = $this->db_connection->prepare($sql);
+        $query->bindParam(1, $email);
+        $query->execute();
+        $result_row = $query->fetchObject();
+        if ($result_row) {
+            // If e-mail and reset_code exist and are correct then update user is_activated value.
+            $sql = "UPDATE users SET reset_code = ? WHERE email = ?";
+            $forgot_password_key = password_hash($email, PASSWORD_DEFAULT);
             $query = $this->db_connection->prepare($sql);
-            $query->bindParam(1, $email);
+            $query->bindParam("1", $forgot_password_key);
+            $query->bindParam("2", $email);
             $query->execute();
-            $result_row = $query->fetchObject();
-            if ($result_row) {
-                // If e-mail and reset_code exist and are correct then update user is_activated value.
-                $sql = "UPDATE users SET reset_code = ? WHERE email = ?";
-                $forgot_password_key = password_hash($email, PASSWORD_DEFAULT);
-                $query = $this->db_connection->prepare($sql);
-                $query->bindParam("1", $forgot_password_key);
-                $query->bindParam("2", $email);
-                $query->execute();
 
 //                $_SESSION['SuccessMessage'] = 'User has been created!';
 
-                $message = "Foi enviado para o seu email instrucções para definir uma nova password.";
+            $message = "Foi enviado para o seu email instrucções para definir uma nova password.";
 //                msg= Prezado usuário, \ n \ nSe este e-mail não se aplicar a você, ignore-o. Parece que você solicitou uma redefinição de senha em nosso site www.yoursitehere.com \ n \ nPara redefinir sua senha, clique no link abaixo. Se você não conseguir clicar nele, cole-o na barra de endereço do navegador da Web. \ N \ n ". $ Pwrurl." \ N \ nObrigado, \ nA Administração
 //                $message = "htp://localhost/caraMetade/email=" . $email . "?codigo=". $forgot_password_key . "";
 //                http://localhost/caraMetade/reset_password.php?email=filipe.martins.400@gmail.com&codigo=$2y$10$jaBnUtGuF8ZvAVGDw2t4TePkzJpwr1Ms/CZeDXA8pwj0mndW0e.MK
@@ -461,14 +461,11 @@ class OneFileLoginApplication {
 //                $headers .= "MIME-Version: 1.0\r\n";
 //                $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 //                mail($to, $subject, $body, $headers);
-                $_SESSION['message'] = $message;
-                return true;
-            } else {
-                $_SESSION['message'] = "O email não existe!";
-            }
+            $_SESSION['message'] = $message;
+            return true;
+        } else {
+            $_SESSION['message'] = "O email não existe!";
         }
-        return false;
-
 
 //        $select = mysql_query("select email,password from user where email='$email'");
 //        if (mysql_num_rows($select) == 1) {
@@ -521,31 +518,95 @@ class OneFileLoginApplication {
             $_SESSION['message'] = "Erro definindo a nova password!";
         }
     }
-    
+
     public function getPerfisCriterioProcura($procuro, $distrito, $idadeInf, $idadeSup) {
         // prepare sql and bind parameters
         $sql = "SELECT nome, data_nasc, Estado_Civil, Descricao FROM perfil
-                WHERE procura = :procuro AND  distrito = :distrito AND ( (data_nasc >= :idade_inferior) && (data_nasc >= :idade_superior)) ";
+                WHERE procura = :procuro AND  distrito = :distrito AND 
+                ( (Year(CURDATE()) -  Year(data_nasc)  >= :idade_inferior) && (Year(CURDATE()) -  Year(data_nasc) <= :idade_superior) )";
         $query = $this->db_connection->prepare($sql);
         $query->bindParam(':procuro', $procuro);
         $query->bindParam(':distrito', $distrito);
+        $query->bindParam(':idade_inferior', $idadeInf);
+        $query->bindParam(':idade_superior', $idadeSup);
         $query->execute();
+        $result_rows = $query->fetchAll();
+        $_SESSION['lstProcura'] = $result_rows;
     }
-    
+
     private function getUserIdByName($username) {
         $sql = "SELECT id FROM users WHERE id = config.userid";
         $query = $this->db_connection->prepare($sql);
         $query->execute();
-        return 1; 
+        return 1;
     }
-    
+
     public function getUserProcuroParams() {
-        $userid = $this->getUserIdByName($_SESSION['username']);
-        $sql = "SELECT procuro, distrito, data_nasc FROM config WHERE userid = :userid";
+        if ($this->createDatabaseConnection()) {
+            $userid = $this->getUserIdByName($_SESSION['username']);
+            $sql = "SELECT procuro, distrito, data_nasc FROM config WHERE userid = :userid";
+            $query = $this->db_connection->prepare($sql);
+            $query->bindParam(':procuro', $_SESSION['procuro']);
+            $query->execute();
+            $_SESSION['procuro'] = "";
+        }
+    }
+
+    private function getAllDistritos() {
+        if ($this->createDatabaseConnection()) {
+            $sql = "SELECT id, distrito FROM Distrito";
+            $query = $this->db_connection->prepare($sql);
+            $query->execute();
+            return $query->fetchAll();
+        }
+    }
+
+    public function setVarsPerfil() {
+        $_SESSION['lstDistritos'] = $this->getAllDistritos();
+    }
+
+    public function actualizaPerfil() {
+        if (!$this->createDatabaseConnection())
+            return;
+
+        // remove html code etc. from username and email
+        $Nome = htmlentities($_POST['Nome'], ENT_QUOTES);
+        $Cidade = htmlentities($_POST['Cidade'], ENT_QUOTES);
+        $Cidade = htmlentities($_POST['Data_Nasc'], ENT_QUOTES);
+        $Habilitacoes = htmlentities($_POST['Habilitacoes'], ENT_QUOTES);
+        $Profissao = htmlentities($_POST['Profissao'], ENT_QUOTES);
+        $Descricao = htmlentities($_POST['Descricao'], ENT_QUOTES);
+        $Altura = htmlentities($_POST['Altura'], ENT_QUOTES);
+        $Peso = htmlentities($_POST['Peso'], ENT_QUOTES);
+
+        $sql = 'INSERT INTO Perfil (Nome, Cidade, Data_Nasc, Habilitacoes, Profissao, Descricao, Altura, Peso )
+                VALUES(:Nome, :Cidade, :Data_Nasc, :Habilitacoes, :Profissao, :Descricao, :Altura, :Peso)
+                ON DUPLICATE KEY UPDATE Nome = $Nome, Cidade = $Cidade, Data_Nasc = $Data_Nasc, Habilitacoes = $Habilitacoes, 
+                Profissao = $Profissao, Descricao = $Descricao, Altura = $Altura, Peso = $Peso';
         $query = $this->db_connection->prepare($sql);
-        $query->bindParam(':procuro', $_SESSION['procuro']);
-        $query->execute();
-        $_SESSION['procuro'] = ""; 
+        $query->bindValue(':Nome', $Nome);
+        $query->bindValue(':Cidade', $Cidade);
+        $query->bindValue(':Data_Nasc', $Data_Nasc);
+        $query->bindValue(':Habilitacoes', $Habilitacoes);
+        $query->bindValue(':Profissao', $Profissao);    
+        $query->bindValue(':Descricao', $Descricao);
+        $query->bindValue(':Altura', $Altura);
+        $query->bindValue(':Peso', $Peso);
+
+// PDO's execute() gives back TRUE when successful, FALSE when not
+// @link http://stackoverflow.com/q/1661863/1114320
+        $registration_success_state = $query->execute();
+
+        if ($registration_success_state) {
+            $this->feedback = "Seu perfil foi actualizado com sucesso!";
+            return true;
+        } else {
+            $this->feedback = "Desculpe, seu registo falhou. Por favor tente novamente.";
+        }
+
+//        INSERT INTO table(column_list)
+//VALUES(value_list)
+//ON DUPLICATE KEY UPDATE column_1 = new_value_1, column_2 = new_value_2, ?;
     }
 
 }

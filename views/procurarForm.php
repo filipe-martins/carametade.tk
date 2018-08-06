@@ -28,55 +28,63 @@
             <header id="CaraMetade">
                 <div class="w3-container">
                     <form action="/caraMetade/procurar.php">
-                    <h4><b>Procura</b></h4>
+                        <h4><b>Procura</b></h4>
 
-                    <div class="inline">
-                        <span>Procuro</span>
-                        <select  name="procuro">
-                            <option value="1">Mulher</option>
-                            <option value="2">Homem</option>
-                        </select>
-                    </div>
+                        <div class="inline">
+                            <span>Procuro</span>
+                            <select  name="procuro">
+                                <option value="1">Mulher</option>
+                                <option value="2">Homem</option>
+                            </select>
+                        </div>
 
-                    <!--distrito-->
-                    <div class="inline">
-                        <span>Distrito</span>
-                        <select name="distrito">
-                            <option value="1">Lisboa</option>
-                            <option value="2">Porto e região Norte</option>
-                            <option value="3">zona Centro</option>
-                            <option value="4">Alentejo</option>
-                            <option value="5">Algarve</option>
-                            <option value="6">Madeira</option>
-                            <option value="7">Açores</option>
-                        </select>
-                    </div>
+                        <!--distrito-->
+                        <div class="inline">
+                            <span>Distrito</span>
+                            <select name="distrito">
+                                <option value="1">Lisboa</option>
+                                <option value="2">Porto e região Norte</option>
+                                <option value="3">zona Centro</option>
+                                <option value="4">Alentejo</option>
+                                <option value="5">Algarve</option>
+                                <option value="6">Madeira</option>
+                                <option value="7">Açores</option>
+                            </select>
+                        </div>
 
-                    <!--idade inf-->
-                    <div class="inline">
-                        <span>Idade entre</span>
-                        <select name="idadeInf">
-                            <?php
-                            for ($i = 18; $i <= 75; $i++) {
-                                echo '<option value="' . $i . '">' . $i . '</option>';                                   
-                            }
-                            ?>
-                        </select>
-                    </div>
+                        <!--idade inf-->
+                        <div class="inline">
+                            <span>Idade entre</span>
+                            <select name="idadeInf">
+                                <?php
+                                for ($i = 18; $i <= 75; $i++) {
+                                    echo '<option value="' . $i . '">' . $i . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
 
-                    <!--idade sup-->
-                    <div class="inline">
-                        <span>e</span>
-                        <select name="idadeSup">
-                            <?php
-                            for ($i = 18; $i <= 75; $i++) {
-                                echo '<option value="' . $i . '">' . $i . '</option>';                                     
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <button class="w3-btn w3-red w3-tiny" style="margin: 40px">Procurar</button>
-</form>
+                        <!--idade sup-->
+                        <div class="inline">
+                            <span>e</span>
+                            <select name="idadeSup">
+                                <?php
+                                for ($i = 18; $i <= 75; $i++) {
+                                    echo '<option value="' . $i . '">' . $i . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <button class="w3-btn w3-red w3-tiny" style="margin: 40px">Procurar</button>
+                    </form>
             </header>    
+
+            <!--construir lista de resultados da procura--> 
+            <?php
+            foreach ($_SESSION['lstProcura'] as $campos => $valores) {
+                echo '<p>' . $valores['nome'] . '</p>';    
+//                echo '<option value="' . $i . '">' . $i . '</option>';
+            }
+            ?>
 

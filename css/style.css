@@ -1,9 +1,84 @@
+form {
+/*    margin: 40px;*/
+    /*padding: 200px, 200px;*/
+    /*padding: 2.5% 0;*/
+    border: 1px dotted red;
+    margin-bottom: 5px;
+    margin-top: 5px;
+
+}
+
+form label {
+    float: left;
+    text-align: right;
+    width: 200px;
+    margin-right: 25px;
+    padding: 2% 0;
+    /*vertical-align:middle;*/
+    /*display:table-cell;*/
+}
+
+form span {
+    float: left;
+    text-align: right;
+    width: 200px;
+    margin-right: 25px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-weight:bold;
+}
+
+form input[type=text]:focus {
+    background-color: lightblue;   
+}
+
+form select {
+    width: 20%;
+    padding: 1% 0;
+}
+
+/*minhas tags*/
+.l-small{ /*campos peqs*/
+  width: 10%;  
+}
+
+/*#parent {position: relative;}  /*posicionar objs um em relaç ao outro
+#child {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 50%;
+    height: 30%;
+    margin: auto;
+}*/
+
+.clear {
+    display: block;
+    clear: both;
+    width: 100%;
+}
+input[type=text] {
+    /*width: 50%;*/
+    padding: 10px 10px;
+    margin: 8px 0;
+    /*box-sizing: border-box;*/
+    /*border: 1px solid #555;*/
+/*    outline: none;*/
+}
+
+
+.tam_perfil{
+   width:100px; 
+}
+
 .inline { 
     display: inline-block; 
     /*border: 1px solid;*/ 
     margin:5px;
-    }
-    
+}
+
 /*.container {
     width: 40%;
     margin: 0 auto;
@@ -63,18 +138,18 @@ p.error{color:#EA4335;}*/
 }
 .CaixasMenu{
     margin-right:4%;
-	float:left;
+        float:left;
         display: flex;
         display:inline-block;
-	width:40%;
-	
-	background-color: white;
-	border: 1px solid #bdbdbd;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	-moz-box-shadow: 0 0 10px #bdbdbd;
-	-webkit-box-shadow: 0 0 10px #bdbdbd;
-	box-shadow: 0 0 10px #bdbdbd;
+        width:40%;
+        
+        background-color: white;
+        border: 1px solid #bdbdbd;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+        -moz-box-shadow: 0 0 10px #bdbdbd;
+        -webkit-box-shadow: 0 0 10px #bdbdbd;
+        box-shadow: 0 0 10px #bdbdbd;
     box-sizing:border-box;
 }
 
