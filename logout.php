@@ -9,6 +9,7 @@ ob_start();
 
 //deletes cookie
 setcookie("username", "", time() - 2592000, "/");
+setcookie("userid", "", time() - 2592000, "/");
 //    $_SESSION = array();    // Unset all of the session variables.
 unset($_SESSION);
 session_destroy();  // Destroy all session data.

@@ -34,7 +34,8 @@ include_once("classes/OneFileLoginApplication.php");
 //} else
   if ($_COOKIE) {
     $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
-    $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
+    $_SESSION['userid'] = isset($_COOKIE['userid']) ? $_COOKIE['userid'] : null;
+//    $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
   }
 if (isset($username) || $application->getUserLoginStatus()) {
     include_once("views/mainForm.php");

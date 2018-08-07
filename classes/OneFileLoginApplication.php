@@ -127,8 +127,8 @@ class OneFileLoginApplication {
     private function performUserLoginAction() {
         if (isset($_GET["action"]) && $_GET["action"] == "logout") {
             $this->doLogout();
-        } elseif (!empty($_SESSION['username']) && ($_SESSION['user_is_logged_in'])) {
-            $this->doLoginWithSessionData();
+//        } elseif (!empty($_SESSION['username']) && ($_SESSION['user_is_logged_in'])) {
+//            $this->doLoginWithSessionData();
         } elseif (isset($_POST["login"])) {
             $this->doLoginWithPostData();
         }
@@ -226,12 +226,13 @@ class OneFileLoginApplication {
             if (password_verify($_POST['password'], $result_row->password)) {
 // write user data into PHP SESSION [a file on your server]
                 $_SESSION['username'] = $result_row->username;
+                $_SESSION['userid'] = $this->getUserIdByName($_SESSION['username']);
                 $_SESSION['email'] = $result_row->email;
                 $_SESSION['user_is_logged_in'] = true;
-
 //definir cookie
                 if (isset($_POST['remember'])) {
                     setcookie('username', $result_row->username, time() + 60 * 60 * 24 * 366, "/");
+                    setcookie('userid', $_SESSION['userid'], time() + 60 * 60 * 24 * 366, "/");
 //                    setcookie('password', $result_row->password, time() + 60*60*24*366);
                 }
 
@@ -332,6 +333,7 @@ class OneFileLoginApplication {
             if ($registration_success_state) {
                 $this->feedback = "Sua conta foi criada com sucesso. Já pode escolher entrar.";
                 $_SESSION['username'] = $user_name;
+                $_SESSION['userid'] = $this->getUserIdByName($_SESSION['username']);
                 $_SESSION['email'] = $user_email;
                 $_SESSION['user_is_logged_in'] = true;
                 return true;
@@ -535,7 +537,7 @@ class OneFileLoginApplication {
     }
 
     private function getUserIdByName($username) {
-        $sql = "SELECT id FROM users WHERE id = config.userid";
+        $sql = "SELECT users.id FROM users, config WHERE users.id = config.userid";
         $query = $this->db_connection->prepare($sql);
         $query->execute();
         return 1;
@@ -543,10 +545,12 @@ class OneFileLoginApplication {
 
     public function getUserProcuroParams() {
         if ($this->createDatabaseConnection()) {
-            $userid = $this->getUserIdByName($_SESSION['username']);
+//            if (!isset($_SESSION['userid']))
+//                $userid = $this->getUserIdByName($_SESSION['username']);
             $sql = "SELECT procuro, distrito, data_nasc FROM config WHERE userid = :userid";
             $query = $this->db_connection->prepare($sql);
             $query->bindParam(':procuro', $_SESSION['procuro']);
+            $query->bindParam(':procuro', $_SESSION['userid']);
             $query->execute();
             $_SESSION['procuro'] = "";
         }
@@ -570,31 +574,34 @@ class OneFileLoginApplication {
             return;
 
         // remove html code etc. from username and email
-        $Nome = htmlentities($_POST['Nome'], ENT_QUOTES);
-        $Cidade = htmlentities($_POST['Cidade'], ENT_QUOTES);
-        $Cidade = htmlentities($_POST['Data_Nasc'], ENT_QUOTES);
-        $Habilitacoes = htmlentities($_POST['Habilitacoes'], ENT_QUOTES);
-        $Profissao = htmlentities($_POST['Profissao'], ENT_QUOTES);
-        $Descricao = htmlentities($_POST['Descricao'], ENT_QUOTES);
-        $Altura = htmlentities($_POST['Altura'], ENT_QUOTES);
-        $Peso = htmlentities($_POST['Peso'], ENT_QUOTES);
+        $Nome = $_POST['Nome'];
+        $UserID = $_SESSION['userid'];
+        $DistritoID = $_POST['distrito'];
+        $Cidade = $_POST['Cidade'];
+        $Data_Nasc = $_POST['Data_Nasc'];
+        $Habilitacoes = $_POST['Habilitacoes'];
+        $Profissao = $_POST['Profissao'];
+        $Descricao = $_POST['Descricao'];
+        $Altura = $_POST['Altura'];
+        $Peso = $_POST['Peso'];
 
-        $sql = 'INSERT INTO Perfil (Nome, Cidade, Data_Nasc, Habilitacoes, Profissao, Descricao, Altura, Peso )
-                VALUES(:Nome, :Cidade, :Data_Nasc, :Habilitacoes, :Profissao, :Descricao, :Altura, :Peso)
-                ON DUPLICATE KEY UPDATE Nome = $Nome, Cidade = $Cidade, Data_Nasc = $Data_Nasc, Habilitacoes = $Habilitacoes, 
-                Profissao = $Profissao, Descricao = $Descricao, Altura = $Altura, Peso = $Peso';
+        $sql = "INSERT INTO Perfil (Nome, Userid, Distritoid, Cidade, Data_Nasc, Habilitacoes, Profissao, Descricao, Altura, Peso )
+                VALUES(:Nome, :Userid, :Distritoid, :Cidade, :Data_Nasc, :Habilitacoes, :Profissao, :Descricao, :Altura, :Peso)
+                ON DUPLICATE KEY UPDATE Nome = VALUES(Nome), Userid = VALUES(Userid), Distritoid = VALUES(Distritoid), Cidade = VALUES(Cidade), 
+                Data_Nasc = VALUES(Data_Nasc), Habilitacoes = VALUES(Habilitacoes), Profissao = VALUES(Profissao), 
+                Descricao = VALUES(Descricao), Altura = VALUES(Altura), Peso = VALUES(Peso);";
         $query = $this->db_connection->prepare($sql);
-        $query->bindValue(':Nome', $Nome);
-        $query->bindValue(':Cidade', $Cidade);
-        $query->bindValue(':Data_Nasc', $Data_Nasc);
-        $query->bindValue(':Habilitacoes', $Habilitacoes);
-        $query->bindValue(':Profissao', $Profissao);    
-        $query->bindValue(':Descricao', $Descricao);
-        $query->bindValue(':Altura', $Altura);
-        $query->bindValue(':Peso', $Peso);
+        $query->bindParam(':Nome', $Nome);
+        $query->bindParam(':Userid', $UserID);
+        $query->bindParam(':Distritoid', $DistritoID);
+        $query->bindParam(':Cidade', $Cidade);
+        $query->bindParam(':Data_Nasc', $Data_Nasc);
+        $query->bindParam(':Habilitacoes', $Habilitacoes);
+        $query->bindParam(':Profissao', $Profissao);
+        $query->bindParam(':Descricao', $Descricao);
+        $query->bindParam(':Altura', $Altura);
+        $query->bindParam(':Peso', $Peso);
 
-// PDO's execute() gives back TRUE when successful, FALSE when not
-// @link http://stackoverflow.com/q/1661863/1114320
         $registration_success_state = $query->execute();
 
         if ($registration_success_state) {
@@ -603,10 +610,6 @@ class OneFileLoginApplication {
         } else {
             $this->feedback = "Desculpe, seu registo falhou. Por favor tente novamente.";
         }
-
-//        INSERT INTO table(column_list)
-//VALUES(value_list)
-//ON DUPLICATE KEY UPDATE column_1 = new_value_1, column_2 = new_value_2, ?;
     }
 
 }
