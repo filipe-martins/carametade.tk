@@ -26,18 +26,18 @@ include_once("classes/OneFileLoginApplication.php");
 //}
 //header('Location:login.php');
 // run the application
-
 //testar se tem password colocada ou cookie
 //if ($_POST) {
 //   $username = isset($_POST['username']) ? $_POST['username'] : null;
 //   $password = isset($_POST['password']) ? $_POST['password'] : null;
 //} else
-  if ($_COOKIE) {
-    $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
-    $_SESSION['userid'] = isset($_COOKIE['userid']) ? $_COOKIE['userid'] : null;
+if (isset($_COOKIE['username']))
+    $_SESSION['username'] = $_COOKIE['username'];
+if (isset($_COOKIE['userid']))
+    $_SESSION['userid'] = $_COOKIE['userid'];
 //    $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
-  }
-if (isset($username) || $application->getUserLoginStatus()) {
+
+if (isset($_SESSION['username'])) {
     include_once("views/mainForm.php");
 //    include_once("views/mainForm.php");    // If user is already logged in redirect back to Main Screen
 } else {

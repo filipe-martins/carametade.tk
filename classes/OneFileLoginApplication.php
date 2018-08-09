@@ -68,7 +68,7 @@ class OneFileLoginApplication {
      */
     private function performMinimumRequirementsCheck() {
         if (version_compare(PHP_VERSION, '5.3.7', '<')) {
-            echo "Desculpe, esta apalicaÃ§Ã£o nÃ£o corre numa versÃ£o do PHP anterior Ã  5.3.7 !";
+            echo "Desculpe, esta apalicação não corre numa versão do PHP anterior à 5.3.7 !";
         } elseif (version_compare(PHP_VERSION, '5.5.0', '<')) {
             require_once("libraries/password_compatibility_library.php");
             return true;
@@ -113,7 +113,7 @@ class OneFileLoginApplication {
             $this->db_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return true;
         } catch (PDOException $e) {
-            $this->feedback = "PDO problema connecÃ§Ã£o Ã  base de dados : " . $e->getMessage();
+            $this->feedback = "Problema connecção à base de dados : " . $e->getMessage();
         } catch (Exception $e) {
             $this->feedback = "Problema geral: " . $e->getMessage();
         }
@@ -175,10 +175,11 @@ class OneFileLoginApplication {
      * The registration flow
      * @return bool
      */
-    private function doRegistration() {
+    public function doRegistration() {
         if ($this->checkRegistrationData()) {
             if ($this->createDatabaseConnection()) {
-                $this->createNewUser();
+                if ($this->createNewUser())
+                    return true; //to show main screen
             }
         }
 // default return
@@ -193,9 +194,9 @@ class OneFileLoginApplication {
         if (!empty($_POST['utilizador']) && !empty($_POST['password'])) {
             return true;
         } elseif (empty($_POST['utilizador'])) {
-            $this->feedback = "Campo do utilizador estÃ¡ vazio.";
+            $this->feedback = "Campo do utilizador está¡ vazio.";
         } elseif (empty($_POST['user_password'])) {
-            $this->feedback = "Campo da password estÃ¡ vazia.";
+            $this->feedback = "Campo da password está¡ vazia.";
         }
 // default return
         return false;
@@ -261,7 +262,6 @@ class OneFileLoginApplication {
 
 // validating the input
         if (!empty($_POST['utilizador']) && strlen($_POST['utilizador']) <= 64 && strlen($_POST['utilizador']) >= 2 && preg_match('/^[a-z\d]{2,64}$/i', $_POST['utilizador']) && !empty($_POST['email']) && strlen($_POST['email']) <= 64 && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) && !empty($_POST['password']) && strlen($_POST['password']) >= 6 && !empty($_POST['password2']) && ($_POST['password'] === $_POST['password2'])) {
-
 // only this case return true, only this case is valid
             return true;
         } elseif (empty($_POST['utilizador'])) {
@@ -271,22 +271,23 @@ class OneFileLoginApplication {
         } elseif ($_POST['password'] !== $_POST['password2']) {
             $this->feedback = "Não introduziu a mesma password nos dois campos!";
         } elseif (strlen($_POST['password']) < 6) {
-            $this->feedback = "A password tem de ter no mÃ­nimo 6 caracteres";
+            $this->feedback = "A password tem de ter no mínimo 6 caracteres";
         } elseif (strlen($_POST['utilizador']) > 64 || strlen($_POST['utilizador']) < 2) {
-            $this->feedback = "O utilizador nÃ£o pode ter menos de 2 or ser maior de 64 caracteres";
+            $this->feedback = "O utilizador não pode ter menos de 2 ou ser maior de 64 caracteres";
         } elseif (!preg_match('/^[a-z\d]{2,64}$/i', $_POST['utilizador'])) {
-            $this->feedback = "Utilizador invÃ¡lido: sÃ³ a-Z e nÃºmeros sÃ£o permitidos, 2 to 64 caracteres";
+            $this->feedback = "Utilizador inválido: só letras a-Z e números são permitidos, 2 a 64 caracteres";
         } elseif (empty($_POST['email'])) {
-            $this->feedback = "Email nÃ£o pode estar vazio";
+            $this->feedback = "Email não pode estar vazio";
         } elseif (strlen($_POST['email']) > 64) {
-            $this->feedback = "Email nÃ£o pode ter mais de 64 caracteres";
+            $this->feedback = "Email não pode ter mais de 64 caracteres";
         } elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $this->feedback = "O email nÃ£o tem um formato vÃ¡lido";
+            $this->feedback = "O email não tem um formato vÃ¡lido";
         } else {
             $this->feedback = "Ocorreu um erro desconhecido!";
         }
 
 // default return
+        $_SESSION['message'] = $this->feedback;
         return false;
     }
 
@@ -309,7 +310,7 @@ class OneFileLoginApplication {
 // If you meet the inventor of PDO, punch him. Seriously.
         $result_row = $query->fetchObject();
         if ($result_row) {
-            $this->feedback = "Desculpe, esse nome de utilizador ou email jÃ¡ foi utilizado. Por favor escolha outro.";
+            $this->feedback = "Desculpe, esse nome de utilizador ou email já foi utilizado. Por favor escolha outro.";
         } else {
             $user_password = $_POST['password'];
 // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 char hash string.
@@ -331,7 +332,7 @@ class OneFileLoginApplication {
             $registration_success_state = $query->execute();
 
             if ($registration_success_state) {
-                $this->feedback = "Sua conta foi criada com sucesso. JÃ¡ pode escolher entrar.";
+                $this->feedback = "Sua conta foi criada com sucesso. Já pode entrar.";
                 $_SESSION['username'] = $user_name;
                 $_SESSION['userid'] = $this->getUserIdByName($_SESSION['username']);
                 $_SESSION['email'] = $user_email;
@@ -537,10 +538,11 @@ class OneFileLoginApplication {
     }
 
     private function getUserIdByName($username) {
-        $sql = "SELECT users.id FROM users, config WHERE users.id = config.userid";
+        $sql = "SELECT id FROM users WHERE username = :username";
         $query = $this->db_connection->prepare($sql);
+        $query->bindValue(':username', $username);
         $query->execute();
-        return 1;
+        return $query->fetchColumn(0);
     }
 
     public function getUserProcuroParams() {
@@ -565,8 +567,18 @@ class OneFileLoginApplication {
         }
     }
 
+    private function getPerfilDataById($userid) {
+        $sql = "select Nome, Distritoid, Cidade, Data_Nasc, Habilitacoes, 
+                Profissao, Descricao, Altura, Peso from Perfil where Userid = :userid";
+        $query = $this->db_connection->prepare($sql);
+        $query->bindValue(":userid", $userid);
+        $query->execute();
+        return $query->fetch();
+    }
+
     public function setVarsPerfil() {
         $_SESSION['lstDistritos'] = $this->getAllDistritos();
+        $_SESSION['PerfilData'] = $this->getPerfilDataById($_SESSION['userid']);
     }
 
     public function actualizaPerfil() {

@@ -20,8 +20,8 @@
 include_once("classes/OneFileLoginApplication.php");
 
 if($application->getUserLoginStatus()){
-    include("views/mainForm.php");   //  If user is already logged in redirect back to index.php
+    include_once("views/mainForm.php");   //  If user is already logged in redirect back to index.php
 } else {
-    include("index.php");    // else back to start
+    include_once("index.php");    // else back to start
 }
 //ob_end_flush();

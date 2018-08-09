@@ -12,19 +12,24 @@ include_once("classes/OneFileLoginApplication.php");
 
 /* Call for login function */
 
-if ($_COOKIE) {
-    $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
-    $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
-}
+//if ($_SESSION['username']) {
+//    
+//} else if ($_COOKIE) { //has cookie
+//    $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : null;
+////    $password = isset($_COOKIE['password']) ? $_COOKIE['password'] : null;
+//}
 
-if (isset($_POST) && !empty($_POST['Nome']))
-{
-    $application->actualizaPerfil();
-}
-if (isset($username) || $application->getUserLoginStatus()) {
-    $application->setVarsPerfil();
-    include_once("views/perfilForm.php");
-//    include_once("views/mainForm.php");    // If user is already logged in show prefil
-} else {
-    include_once("views/loginForm.php");
+
+if (isset($_POST) && !empty($_POST['Nome'])) { //submited form perfil
+    if ($application->actualizaPerfil()) {
+        include_once("index.php");    // back to start
+    }
+} else { //first time
+    if ($_SESSION['username'] ) {
+        $application->setVarsPerfil();
+        include_once("views/perfilForm.php");
+    } 
+//    else { //n fez login //apagar??
+//        include_once("views/loginForm.php");
+//    }
 }
